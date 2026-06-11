@@ -903,6 +903,29 @@
       color: var(--text-muted);
       font-size: 0.85rem;
     }
+    .plan-pos-card {
+      background: linear-gradient(135deg, #eff6ff, #dbeafe);
+      border: 1.5px solid #93c5fd;
+      border-radius: 10px;
+      padding: 0.75rem;
+      text-align: center;
+      margin-top: 0.75rem;
+    }
+    [data-theme="dark"] .plan-pos-card { background: linear-gradient(135deg, #111c33, #0f172a); border-color: #1e40af; }
+    .ppc-label {
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--info);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .ppc-value {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--info);
+      line-height: 1.1;
+      font-variant-numeric: tabular-nums;
+    }
   </style>
 </head>
 <body>
@@ -1124,6 +1147,10 @@
             <div class="pr-mukrs" id="plan-a-mukrs">&mdash;</div>
             <div class="pr-parts" id="plan-a-parts"></div>
           </div>
+          <div class="plan-pos-card" id="plan-a-pos-card" style="display:none;">
+            <div class="ppc-label">Position needed</div>
+            <div class="ppc-value" id="plan-a-pos-value"></div>
+          </div>
         </div>
         <div class="plan-col" id="plan-b-col">
           <div class="plan-title" id="plan-b-title">Plan B</div>
@@ -1145,6 +1172,10 @@
             <div class="pr-label">New MUKRS</div>
             <div class="pr-mukrs" id="plan-b-mukrs">&mdash;</div>
             <div class="pr-parts" id="plan-b-parts"></div>
+          </div>
+          <div class="plan-pos-card" id="plan-b-pos-card" style="display:none;">
+            <div class="ppc-label">Position needed</div>
+            <div class="ppc-value" id="plan-b-pos-value"></div>
           </div>
         </div>
       </div>
@@ -1935,31 +1966,41 @@ function recalcCompare() {
   const titleBEl = document.getElementById('plan-b-title');
 
   let aCalc = null, bCalc = null;
+  const posACard = document.getElementById('plan-a-pos-card');
+  const posBCard = document.getElementById('plan-b-pos-card');
+  const posAValue = document.getElementById('plan-a-pos-value');
+  const posBValue = document.getElementById('plan-b-pos-value');
 
   if (hasA) {
     aCalc = calculateMUKRSWithExtra(tournaments, aScore, aDays);
     mukrsAEl.textContent = aCalc.mukrs.toFixed(2);
-    let extra = '';
+    partsAEl.innerHTML = `A: ${aCalc.partA.toFixed(1)} &middot; B: ${aCalc.partB.toFixed(1)}`;
     if (!isNaN(aPlayers) && aPlayers >= 2) {
-      extra = ` &middot; ${formatPosition(scoreToPosition(aScore, aPlayers))}`;
+      posACard.style.display = 'block';
+      posAValue.innerHTML = `${formatPosition(scoreToPosition(aScore, aPlayers))} <span style="font-size:0.9rem;font-weight:500;color:var(--text-muted);">of ${aPlayers}</span>`;
+    } else {
+      posACard.style.display = 'none';
     }
-    partsAEl.innerHTML = `A: ${aCalc.partA.toFixed(1)} &middot; B: ${aCalc.partB.toFixed(1)}${extra}`;
   } else {
     mukrsAEl.innerHTML = '&mdash;';
     partsAEl.innerHTML = '';
+    posACard.style.display = 'none';
   }
 
   if (hasB) {
     bCalc = calculateMUKRSWithExtra(tournaments, bScore, bDays);
     mukrsBEl.textContent = bCalc.mukrs.toFixed(2);
-    let extra = '';
+    partsBEl.innerHTML = `A: ${bCalc.partA.toFixed(1)} &middot; B: ${bCalc.partB.toFixed(1)}`;
     if (!isNaN(bPlayers) && bPlayers >= 2) {
-      extra = ` &middot; ${formatPosition(scoreToPosition(bScore, bPlayers))}`;
+      posBCard.style.display = 'block';
+      posBValue.innerHTML = `${formatPosition(scoreToPosition(bScore, bPlayers))} <span style="font-size:0.9rem;font-weight:500;color:var(--text-muted);">of ${bPlayers}</span>`;
+    } else {
+      posBCard.style.display = 'none';
     }
-    partsBEl.innerHTML = `A: ${bCalc.partA.toFixed(1)} &middot; B: ${bCalc.partB.toFixed(1)}${extra}`;
   } else {
     mukrsBEl.innerHTML = '&mdash;';
     partsBEl.innerHTML = '';
+    posBCard.style.display = 'none';
   }
 
   // Highlight winner
