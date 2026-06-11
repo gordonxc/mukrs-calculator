@@ -1,5 +1,5 @@
 const CACHE_NAME = 'mukrs-v1';
-const ASSETS = ['/', '/index.html'];
+const ASSETS = ['/', '/index.html', '/style.css', '/app.js'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
