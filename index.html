@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MUKRS Calculator</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1a7a4c">
   <style>
     :root {
       --primary: #1a7a4c;
@@ -25,7 +27,54 @@
       --radius: 12px;
       --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
       --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+      --row-border: #f0f0f0;
+      --gauge-bg: #e5e7eb;
+      --hover-bg: #eef0f2;
+      --part-a-bg: #f0fdf4;
+      --part-b-bg: #eff6ff;
+      --notif-bg: #1f2937;
     }
+
+    [data-theme="dark"] {
+      --bg: #0f1117;
+      --card: #1a1d27;
+      --text: #e4e6eb;
+      --text-muted: #8b8fa3;
+      --border: #2d3039;
+      --primary-light: #1a2e24;
+      --danger-light: #2a1215;
+      --warning-light: #2a2010;
+      --success-light: #0f261a;
+      --info-light: #111c33;
+      --row-border: #252830;
+      --gauge-bg: #2d3039;
+      --hover-bg: #24272f;
+      --part-a-bg: #0f1f16;
+      --part-b-bg: #111c33;
+      --notif-bg: #e4e6eb;
+      --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    [data-theme="dark"] .results-table td { border-bottom-color: var(--row-border); }
+    [data-theme="dark"] .scenario-item:hover { background: var(--hover-bg); }
+    [data-theme="dark"] .bd-table td { border-bottom-color: var(--row-border); }
+    [data-theme="dark"] .bd-table .part-a { background: var(--part-a-bg); }
+    [data-theme="dark"] .bd-table .part-b { background: var(--part-b-bg); }
+    [data-theme="dark"] .bd-table .dropped { color: #555; }
+    [data-theme="dark"] .bd-table .placeholder { color: #555; }
+    [data-theme="dark"] .gauge-bar { background: var(--gauge-bg); }
+    [data-theme="dark"] .table-wrap::-webkit-scrollbar-thumb { background: #444; }
+    [data-theme="dark"] .notification { background: var(--notif-bg); color: #1a1d27; }
+    [data-theme="dark"] .position-card { background: linear-gradient(135deg, #111c33, #0f172a); border-color: #1e40af; }
+    [data-theme="dark"] .target-result.needed { background: linear-gradient(135deg, #2a2010, #292524); border-color: #b45309; }
+    [data-theme="dark"] .target-result.impossible { border-color: #7f1d1d; }
+    [data-theme="dark"] .target-result.already { border-color: #065f46; }
+    [data-theme="dark"] .eligibility-warning { background: var(--warning-light); border-color: #92400e; color: #fbbf24; }
+    [data-theme="dark"] input[type="number"] { background: #12141c; border-color: #2d3039; color: var(--text); }
+    [data-theme="dark"] input[type="number"]:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26,122,76,0.25); }
+    [data-theme="dark"] textarea { background: #12141c; border-color: #2d3039; color: var(--text); }
+    [data-theme="dark"] .btn-outline:hover { border-color: #444; background: var(--hover-bg); }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -749,6 +798,111 @@
       color: var(--primary);
       text-decoration: none;
     }
+
+    /* Theme toggle */
+    .theme-toggle {
+      background: rgba(255,255,255,0.15);
+      border: 1.5px solid rgba(255,255,255,0.3);
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      transition: background 0.2s;
+      position: absolute;
+      right: 1.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .theme-toggle:hover { background: rgba(255,255,255,0.25); }
+    header { position: relative; }
+
+    /* Compare Plans */
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+    @media (max-width: 600px) {
+      .compare-grid { grid-template-columns: 1fr; }
+    }
+    .plan-col {
+      padding: 1rem;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .plan-col.winner {
+      border-color: var(--success);
+      background: var(--success-light);
+    }
+    .plan-title {
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .plan-title .badge {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      background: var(--success);
+      color: white;
+    }
+    .plan-inputs {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .plan-result {
+      text-align: center;
+      padding: 0.75rem;
+      background: var(--bg);
+      border-radius: 8px;
+    }
+    .plan-result .pr-mukrs {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--primary);
+      font-variant-numeric: tabular-nums;
+    }
+    .plan-result .pr-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .plan-result .pr-parts {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 0.4rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .plan-vs {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+    }
+    .compare-empty {
+      text-align: center;
+      padding: 1.5rem 1rem;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
   </style>
 </head>
 <body>
@@ -756,6 +910,7 @@
 <header>
   <h1>MUKRS Calculator</h1>
   <p>Mahjong UK Ranking System &mdash; calculate your path to the next rank</p>
+  <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn" title="Toggle dark mode" aria-label="Toggle dark mode">&#9790;</button>
 </header>
 
 <div class="container">
@@ -809,6 +964,7 @@
 
         <div class="actions-row" id="actions-row" style="display:none;">
           <button class="btn btn-outline btn-sm" onclick="clearAll()">Clear All</button>
+          <button class="btn btn-outline btn-sm" onclick="shareUrl()">&#128279; Share</button>
           <button class="btn btn-outline btn-sm" onclick="exportResults()">Export JSON</button>
           <button class="btn btn-outline btn-sm" onclick="importResults()">Import JSON</button>
           <button class="btn btn-outline btn-sm" onclick="loadExample()">Load Example</button>
@@ -938,6 +1094,64 @@
 
   </div>
 
+  <!-- Compare Plans -->
+  <div class="card" style="margin-top: 1.5rem;">
+    <div class="card-header">
+      <div class="icon blue">&#9878;</div>
+      Compare Plans
+    </div>
+    <div class="card-body">
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Compare two upcoming tournament options side-by-side to see which gives the better MUKRS outcome.</p>
+      <div class="compare-grid">
+        <div class="plan-col" id="plan-a-col">
+          <div class="plan-title" id="plan-a-title">Plan A</div>
+          <div class="plan-inputs">
+            <div class="form-group">
+              <label>Days</label>
+              <input type="number" id="plan-a-days" min="1" max="10" value="2" oninput="recalcCompare()">
+            </div>
+            <div class="form-group">
+              <label>Score</label>
+              <input type="number" id="plan-a-score" min="0" max="1000" value="600" oninput="recalcCompare()">
+            </div>
+            <div class="form-group">
+              <label>Players</label>
+              <input type="number" id="plan-a-players" min="2" max="500" placeholder="60" oninput="recalcCompare()">
+            </div>
+          </div>
+          <div class="plan-result" id="plan-a-result">
+            <div class="pr-label">New MUKRS</div>
+            <div class="pr-mukrs" id="plan-a-mukrs">&mdash;</div>
+            <div class="pr-parts" id="plan-a-parts"></div>
+          </div>
+        </div>
+        <div class="plan-col" id="plan-b-col">
+          <div class="plan-title" id="plan-b-title">Plan B</div>
+          <div class="plan-inputs">
+            <div class="form-group">
+              <label>Days</label>
+              <input type="number" id="plan-b-days" min="1" max="10" value="3" oninput="recalcCompare()">
+            </div>
+            <div class="form-group">
+              <label>Score</label>
+              <input type="number" id="plan-b-score" min="0" max="1000" value="500" oninput="recalcCompare()">
+            </div>
+            <div class="form-group">
+              <label>Players</label>
+              <input type="number" id="plan-b-players" min="2" max="500" placeholder="80" oninput="recalcCompare()">
+            </div>
+          </div>
+          <div class="plan-result" id="plan-b-result">
+            <div class="pr-label">New MUKRS</div>
+            <div class="pr-mukrs" id="plan-b-mukrs">&mdash;</div>
+            <div class="pr-parts" id="plan-b-parts"></div>
+          </div>
+        </div>
+      </div>
+      <div id="compare-empty" class="compare-empty">Add tournament results above to compare plans</div>
+    </div>
+  </div>
+
   <div class="info-section">
     <h3>How MUKRS Works</h3>
     <ul>
@@ -972,6 +1186,7 @@
 // ── State ──────────────────────────────────────────────────────────
 let tournaments = []; // { score: number, days: number, id: number }
 let nextId = 0;
+let loadedFromHash = false;
 
 // ── Persistence ────────────────────────────────────────────────────
 function saveState() {
@@ -1108,7 +1323,9 @@ function render() {
   renderResultsList();
   renderMUKRS();
   recalcTarget();
+  recalcCompare();
   saveState();
+  updateHash();
 }
 
 function renderResultsList() {
@@ -1606,8 +1823,170 @@ document.getElementById('days-input').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') addResult();
 });
 
+// ── Theme ──────────────────────────────────────────────────────────
+function getPreferredTheme() {
+  const stored = localStorage.getItem('mukrs_theme');
+  if (stored) return stored;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const btn = document.getElementById('theme-btn');
+  if (btn) btn.innerHTML = theme === 'dark' ? '&#9788;' : '&#9790;';
+  // Update theme-color meta
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.content = theme === 'dark' ? '#0f1117' : '#1a7a4c';
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'light';
+  const next = current === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('mukrs_theme', next);
+  applyTheme(next);
+}
+
+applyTheme(getPreferredTheme());
+
+// ── Share URL ──────────────────────────────────────────────────────
+function encodeState() {
+  const data = tournaments.map(t => ({ s: t.score, d: t.days, n: t.name || '' }));
+  try {
+    return btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+  } catch (e) { return ''; }
+}
+
+function updateHash() {
+  if (tournaments.length > 0) {
+    location.hash = encodeState();
+  } else {
+    history.replaceState(null, '', location.pathname + location.search);
+  }
+}
+
+function loadFromHash() {
+  const hash = location.hash.slice(1);
+  if (!hash) return false;
+  try {
+    const json = decodeURIComponent(escape(atob(hash)));
+    const data = JSON.parse(json);
+    if (Array.isArray(data) && data.length > 0) {
+      tournaments = data.map(t => ({
+        score: Number(t.s) || 0,
+        days: Number(t.d) || 1,
+        name: t.n || '',
+        id: nextId++
+      }));
+      return true;
+    }
+  } catch (e) { /* ignore */ }
+  return false;
+}
+
+function shareUrl() {
+  updateHash();
+  const url = location.href;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(() => notify('Link copied to clipboard'));
+  } else {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = url;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    notify('Link copied to clipboard');
+  }
+}
+
+// ── Compare Plans ──────────────────────────────────────────────────
+function recalcCompare() {
+  const emptyEl = document.getElementById('compare-empty');
+  const colA = document.getElementById('plan-a-col');
+  const colB = document.getElementById('plan-b-col');
+
+  if (tournaments.length === 0) {
+    emptyEl.style.display = 'block';
+    colA.style.display = 'none';
+    colB.style.display = 'none';
+    return;
+  }
+
+  emptyEl.style.display = 'none';
+  colA.style.display = 'block';
+  colB.style.display = 'block';
+
+  const aDays = parseInt(document.getElementById('plan-a-days').value) || 1;
+  const aScore = parseInt(document.getElementById('plan-a-score').value);
+  const aPlayers = parseInt(document.getElementById('plan-a-players').value);
+  const bDays = parseInt(document.getElementById('plan-b-days').value) || 1;
+  const bScore = parseInt(document.getElementById('plan-b-score').value);
+  const bPlayers = parseInt(document.getElementById('plan-b-players').value);
+
+  const hasA = !isNaN(aScore);
+  const hasB = !isNaN(bScore);
+
+  const mukrsAEl = document.getElementById('plan-a-mukrs');
+  const mukrsBEl = document.getElementById('plan-b-mukrs');
+  const partsAEl = document.getElementById('plan-a-parts');
+  const partsBEl = document.getElementById('plan-b-parts');
+  const titleAEl = document.getElementById('plan-a-title');
+  const titleBEl = document.getElementById('plan-b-title');
+
+  let aCalc = null, bCalc = null;
+
+  if (hasA) {
+    aCalc = calculateMUKRSWithExtra(tournaments, aScore, aDays);
+    mukrsAEl.textContent = aCalc.mukrs.toFixed(2);
+    let extra = '';
+    if (!isNaN(aPlayers) && aPlayers >= 2) {
+      extra = ` &middot; ${formatPosition(scoreToPosition(aScore, aPlayers))}`;
+    }
+    partsAEl.innerHTML = `A: ${aCalc.partA.toFixed(1)} &middot; B: ${aCalc.partB.toFixed(1)}${extra}`;
+  } else {
+    mukrsAEl.innerHTML = '&mdash;';
+    partsAEl.innerHTML = '';
+  }
+
+  if (hasB) {
+    bCalc = calculateMUKRSWithExtra(tournaments, bScore, bDays);
+    mukrsBEl.textContent = bCalc.mukrs.toFixed(2);
+    let extra = '';
+    if (!isNaN(bPlayers) && bPlayers >= 2) {
+      extra = ` &middot; ${formatPosition(scoreToPosition(bScore, bPlayers))}`;
+    }
+    partsBEl.innerHTML = `A: ${bCalc.partA.toFixed(1)} &middot; B: ${bCalc.partB.toFixed(1)}${extra}`;
+  } else {
+    mukrsBEl.innerHTML = '&mdash;';
+    partsBEl.innerHTML = '';
+  }
+
+  // Highlight winner
+  colA.classList.remove('winner');
+  colB.classList.remove('winner');
+  titleAEl.innerHTML = 'Plan A';
+  titleBEl.innerHTML = 'Plan B';
+
+  if (aCalc && bCalc) {
+    if (aCalc.mukrs > bCalc.mukrs) {
+      colA.classList.add('winner');
+      titleAEl.innerHTML = 'Plan A <span class="badge">Better</span>';
+    } else if (bCalc.mukrs > aCalc.mukrs) {
+      colB.classList.add('winner');
+      titleBEl.innerHTML = 'Plan B <span class="badge">Better</span>';
+    }
+  }
+}
+
+// ── Service Worker ─────────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
 // ── Init ───────────────────────────────────────────────────────────
-loadState();
+loadedFromHash = loadFromHash();
+if (!loadedFromHash) loadState();
 render();
 </script>
 
